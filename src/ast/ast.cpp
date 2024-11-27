@@ -5,6 +5,8 @@
 #include "ast.h"
 #include <sstream>
 
+using namespace Ast;
+
 std::string Program::tokenLiteral() {
     if (!this->statements.empty()) {
         auto statement = this->statements[0];
@@ -196,8 +198,8 @@ std::string CallExpression::string() {
 
     oss << "(";
 
-    for (const auto argument : this->arguments) {
-        if(argument != nullptr) {
+    for (const auto argument: this->arguments) {
+        if (argument != nullptr) {
             args.push_back(argument->string());
         }
     }

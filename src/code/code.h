@@ -112,20 +112,20 @@ inline std::map<OpCode, Definition> definitions{
     {OpCode::OpGetFree, {"OpGetFree", {1}}},
 };
 
-std::string string(Instructions& ins);
+std::string string(Instructions &ins);
 
 std::string fmtInstructions(Definition &def, std::vector<int> operands);
 
-Definition *lookup(uint8_t op);
+Instructions make(OpCode op, const std::vector<int> &operands);
+
+std::pair<std::vector<int>, int> readOperands(const Definition &def, const Instructions &ins);
 
 void putUint16BE(Instructions &ins, size_t offset, uint16_t value);
-
-Instructions make(OpCode op, const std::vector<int> &operands);
 
 uint8_t readUnit8(const Instructions &ins);
 
 uint16_t readUnit16(const Instructions &ins);
 
-std::pair<std::vector<int>, int> readOperands(const Definition &def, const Instructions &ins);
+Definition *lookup(uint8_t op);
 
 #endif //CODE_H

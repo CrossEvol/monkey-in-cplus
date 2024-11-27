@@ -9,326 +9,328 @@
 #include <vector>
 #include "../token/token.h"
 
-class Node {
-public:
-    virtual ~Node() = default;
+namespace Ast {
+    class Node {
+    public:
+        virtual ~Node() = default;
 
-    virtual std::string tokenLiteral() { return "???"; }
+        virtual std::string tokenLiteral() { return "???"; }
 
-    virtual std::string string() { return "???"; }
-};
-
-class Statement : public Node {
-public:
-    ~Statement() override = default;
-
-    void statementNode() {
+        virtual std::string string() { return "???"; }
     };
 
-    virtual std::string tokenLiteral() { return "???"; }
+    class Statement : public Node {
+    public:
+        ~Statement() override = default;
 
-    virtual std::string string() { return "???"; }
-};
+        void statementNode() {
+        };
 
-class Expression : public Node {
-public:
-    ~Expression() override = default;
+        virtual std::string tokenLiteral() { return "???"; }
 
-    void expressionNode() {
+        virtual std::string string() { return "???"; }
     };
 
-    virtual std::string tokenLiteral() { return "???"; }
+    class Expression : public Node {
+    public:
+        ~Expression() override = default;
 
-    virtual std::string string() { return "???"; }
-};
+        void expressionNode() {
+        };
 
-class Program final : public Node {
-private:
-    std::vector<Statement> statements;
+        virtual std::string tokenLiteral() { return "???"; }
 
-public:
-    ~Program() override = default;
+        virtual std::string string() { return "???"; }
+    };
 
-    explicit Program(const std::vector<Statement> &statements)
-        : statements(statements) {
-    }
+    class Program final : public Node {
+    private:
+        std::vector<Statement> statements;
 
-    std::string tokenLiteral() override;
+    public:
+        ~Program() override = default;
 
-    std::string string() override;
-};
+        explicit Program(const std::vector<Statement> &statements)
+            : statements(statements) {
+        }
 
-class Identifier final : public Expression {
-public:
-    Token token;
-    std::string value;
+        std::string tokenLiteral() override;
 
-    Identifier(Token token, std::string value)
-        : token(std::move(token)),
-          value(std::move(value)) {
-    }
+        std::string string() override;
+    };
 
-    ~Identifier() override = default;
+    class Identifier final : public Expression {
+    public:
+        Token token;
+        std::string value;
 
-    std::string tokenLiteral() override;
+        Identifier(Token token, std::string value)
+            : token(std::move(token)),
+              value(std::move(value)) {
+        }
 
-    std::string string() override;
-};
+        ~Identifier() override = default;
 
-class LetStatement final : public Statement {
-public:
-    Token token;
-    Identifier *name;
-    Expression *value;
+        std::string tokenLiteral() override;
 
-    LetStatement(Token token, Identifier *name, Expression *value)
-        : token(std::move(token)),
-          name(std::move(name)),
-          value(value) {
-    }
+        std::string string() override;
+    };
 
-    ~LetStatement() override = default;
+    class LetStatement final : public Statement {
+    public:
+        Token token;
+        Identifier *name;
+        Expression *value;
 
-    std::string tokenLiteral() override;
+        LetStatement(Token token, Identifier *name, Expression *value)
+            : token(std::move(token)),
+              name(std::move(name)),
+              value(value) {
+        }
 
-    std::string string() override;
-};
+        ~LetStatement() override = default;
 
-class ReturnStatement final : public Statement {
-public:
-    Token token;
-    Expression *returnValue;
+        std::string tokenLiteral() override;
 
-    ReturnStatement(Token token, Expression *return_value)
-        : token(std::move(token)),
-          returnValue(return_value) {
-    }
+        std::string string() override;
+    };
 
-    ~ReturnStatement() override = default;
+    class ReturnStatement final : public Statement {
+    public:
+        Token token;
+        Expression *returnValue;
 
-    std::string tokenLiteral() override;
+        ReturnStatement(Token token, Expression *return_value)
+            : token(std::move(token)),
+              returnValue(return_value) {
+        }
 
-    std::string string() override;
-};
+        ~ReturnStatement() override = default;
 
-class ExpressionStatement final : public Statement {
-public:
-    Token token;
-    Expression *expression;
+        std::string tokenLiteral() override;
 
-    ExpressionStatement(Token token, Expression *expression)
-        : token(std::move(token)),
-          expression(expression) {
-    }
+        std::string string() override;
+    };
 
-    ~ExpressionStatement() override = default;
+    class ExpressionStatement final : public Statement {
+    public:
+        Token token;
+        Expression *expression;
 
-    std::string tokenLiteral() override;
+        ExpressionStatement(Token token, Expression *expression)
+            : token(std::move(token)),
+              expression(expression) {
+        }
 
-    std::string string() override;
-};
+        ~ExpressionStatement() override = default;
 
-class BlockStatement final : public Statement {
-public:
-    Token token;
-    std::vector<Statement> statements;
+        std::string tokenLiteral() override;
 
-    BlockStatement(Token token, const std::vector<Statement> &statements)
-        : token(std::move(token)),
-          statements(statements) {
-    }
+        std::string string() override;
+    };
 
-    ~BlockStatement() override = default;
+    class BlockStatement final : public Statement {
+    public:
+        Token token;
+        std::vector<Statement> statements;
 
-    std::string tokenLiteral() override;
+        BlockStatement(Token token, const std::vector<Statement> &statements)
+            : token(std::move(token)),
+              statements(statements) {
+        }
 
-    std::string string() override;
-};
+        ~BlockStatement() override = default;
 
-class Boolean final : public Expression {
-public:
-    Token token;
-    bool value;
+        std::string tokenLiteral() override;
 
-    Boolean(Token token, bool value)
-        : token(std::move(token)),
-          value(value) {
-    }
+        std::string string() override;
+    };
 
-    ~Boolean() override = default;
+    class Boolean final : public Expression {
+    public:
+        Token token;
+        bool value;
 
-    std::string tokenLiteral() override;
+        Boolean(Token token, bool value)
+            : token(std::move(token)),
+              value(value) {
+        }
 
-    std::string string() override;
-};
+        ~Boolean() override = default;
 
-class IntegerLiteral final : public Expression {
-public:
-    Token token;
-    std::int64_t value;
+        std::string tokenLiteral() override;
 
-    IntegerLiteral(Token token, std::int64_t value)
-        : token(std::move(token)),
-          value(value) {
-    }
+        std::string string() override;
+    };
 
-    ~IntegerLiteral() override = default;
+    class IntegerLiteral final : public Expression {
+    public:
+        Token token;
+        std::int64_t value;
 
-    std::string tokenLiteral() override;
+        IntegerLiteral(Token token, std::int64_t value)
+            : token(std::move(token)),
+              value(value) {
+        }
 
-    std::string string() override;
-};
+        ~IntegerLiteral() override = default;
 
-class PrefixExpression final : public Expression {
-public:
-    Token token;
-    std::string operator_;
-    Expression *right;
+        std::string tokenLiteral() override;
 
-    PrefixExpression(Token token, std::string op, Expression *right)
-        : token(std::move(token)), operator_(std::move(op)), right(right) {
-    }
+        std::string string() override;
+    };
 
-    ~PrefixExpression() override = default;
+    class PrefixExpression final : public Expression {
+    public:
+        Token token;
+        std::string operator_;
+        Expression *right;
 
-    std::string tokenLiteral() override;
+        PrefixExpression(Token token, std::string op, Expression *right)
+            : token(std::move(token)), operator_(std::move(op)), right(right) {
+        }
 
-    std::string string() override;
-};
+        ~PrefixExpression() override = default;
 
-class InfixExpression final : public Expression {
-public:
-    Token token;
-    Expression *left;
-    std::string operator_;
-    Expression *right;
+        std::string tokenLiteral() override;
 
-    InfixExpression(Token token, Expression *left, std::string op, Expression *right)
-        : token(std::move(token)), left(left), operator_(std::move(op)), right(right) {
-    }
+        std::string string() override;
+    };
 
-    ~InfixExpression() override = default;
+    class InfixExpression final : public Expression {
+    public:
+        Token token;
+        Expression *left;
+        std::string operator_;
+        Expression *right;
 
-    std::string tokenLiteral() override;
+        InfixExpression(Token token, Expression *left, std::string op, Expression *right)
+            : token(std::move(token)), left(left), operator_(std::move(op)), right(right) {
+        }
 
-    std::string string() override;
-};
+        ~InfixExpression() override = default;
 
-class IfExpression final : public Expression {
-public:
-    Token token;
-    Expression *condition;
-    BlockStatement *consequence;
-    BlockStatement *alternative;
+        std::string tokenLiteral() override;
 
-    IfExpression(Token token, Expression *condition, BlockStatement *consequence, BlockStatement *alternative)
-        : token(std::move(token)), condition(condition), consequence(consequence), alternative(alternative) {
-    }
+        std::string string() override;
+    };
 
-    ~IfExpression() override = default;
+    class IfExpression final : public Expression {
+    public:
+        Token token;
+        Expression *condition;
+        BlockStatement *consequence;
+        BlockStatement *alternative;
 
-    std::string tokenLiteral() override;
+        IfExpression(Token token, Expression *condition, BlockStatement *consequence, BlockStatement *alternative)
+            : token(std::move(token)), condition(condition), consequence(consequence), alternative(alternative) {
+        }
 
-    std::string string() override;
-};
+        ~IfExpression() override = default;
 
-class FunctionLiteral final : public Expression {
-public:
-    Token token;
-    std::vector<Identifier> parameters;
-    BlockStatement *body;
+        std::string tokenLiteral() override;
 
-    FunctionLiteral(Token token, const std::vector<Identifier> &parameters, BlockStatement *body)
-        : token(std::move(token)), parameters(parameters), body(body) {
-    }
+        std::string string() override;
+    };
 
-    ~FunctionLiteral() override = default;
+    class FunctionLiteral final : public Expression {
+    public:
+        Token token;
+        std::vector<Identifier> parameters;
+        BlockStatement *body;
 
-    std::string tokenLiteral() override;
+        FunctionLiteral(Token token, const std::vector<Identifier> &parameters, BlockStatement *body)
+            : token(std::move(token)), parameters(parameters), body(body) {
+        }
 
-    std::string string() override;
-};
+        ~FunctionLiteral() override = default;
 
-class CallExpression final : public Expression {
-public:
-    Token token;
-    Expression *function;
-    std::vector<Expression *> arguments;
+        std::string tokenLiteral() override;
 
-    CallExpression(Token token, Expression *function, const std::vector<Expression *> &arguments)
-        : token(std::move(token)), function(function), arguments(arguments) {
-    }
+        std::string string() override;
+    };
 
-    ~CallExpression() override = default;
+    class CallExpression final : public Expression {
+    public:
+        Token token;
+        Expression *function;
+        std::vector<Expression *> arguments;
 
-    std::string tokenLiteral() override;
+        CallExpression(Token token, Expression *function, const std::vector<Expression *> &arguments)
+            : token(std::move(token)), function(function), arguments(arguments) {
+        }
 
-    std::string string() override;
-};
+        ~CallExpression() override = default;
 
-class StringLiteral final : public Expression {
-public:
-    Token token;
-    std::string value;
+        std::string tokenLiteral() override;
 
-    StringLiteral(Token token, std::string value)
-        : token(std::move(token)), value(std::move(value)) {
-    }
+        std::string string() override;
+    };
 
-    ~StringLiteral() override = default;
+    class StringLiteral final : public Expression {
+    public:
+        Token token;
+        std::string value;
 
-    std::string tokenLiteral() override;
+        StringLiteral(Token token, std::string value)
+            : token(std::move(token)), value(std::move(value)) {
+        }
 
-    std::string string() override;
-};
+        ~StringLiteral() override = default;
 
-class ArrayLiteral final : public Expression {
-public:
-    Token token;
-    std::vector<Expression *> elements;
+        std::string tokenLiteral() override;
 
-    ArrayLiteral(Token token, const std::vector<Expression *> &elements)
-        : token(std::move(token)), elements(elements) {
-    }
+        std::string string() override;
+    };
 
-    ~ArrayLiteral() override = default;
+    class ArrayLiteral final : public Expression {
+    public:
+        Token token;
+        std::vector<Expression *> elements;
 
-    std::string tokenLiteral() override;
+        ArrayLiteral(Token token, const std::vector<Expression *> &elements)
+            : token(std::move(token)), elements(elements) {
+        }
 
-    std::string string() override;
-};
+        ~ArrayLiteral() override = default;
 
-class IndexExpression final : public Expression {
-public:
-    Token token;
-    Expression *left;
-    Expression *index;
+        std::string tokenLiteral() override;
 
-    IndexExpression(Token token, Expression *left, Expression *index)
-        : token(std::move(token)), left(left), index(index) {
-    }
+        std::string string() override;
+    };
 
-    ~IndexExpression() override = default;
+    class IndexExpression final : public Expression {
+    public:
+        Token token;
+        Expression *left;
+        Expression *index;
 
-    std::string tokenLiteral() override;
+        IndexExpression(Token token, Expression *left, Expression *index)
+            : token(std::move(token)), left(left), index(index) {
+        }
 
-    std::string string() override;
-};
+        ~IndexExpression() override = default;
 
-class HashLiteral final : public Expression {
-public:
-    Token token;
-    std::map<Expression *, Expression *> pairs;
+        std::string tokenLiteral() override;
 
-    HashLiteral(Token token, const std::map<Expression *, Expression *> &pairs)
-        : token(std::move(token)), pairs(pairs) {
-    }
+        std::string string() override;
+    };
 
-    ~HashLiteral() override = default;
+    class HashLiteral final : public Expression {
+    public:
+        Token token;
+        std::map<Expression *, Expression *> pairs;
 
-    std::string tokenLiteral() override;
+        HashLiteral(Token token, const std::map<Expression *, Expression *> &pairs)
+            : token(std::move(token)), pairs(pairs) {
+        }
 
-    std::string string() override;
-};
+        ~HashLiteral() override = default;
+
+        std::string tokenLiteral() override;
+
+        std::string string() override;
+    };
+}
 
 #endif //AST_H

@@ -77,15 +77,16 @@ std::pair<std::vector<int>, int> readOperands(const Definition &def, const Instr
     return {operands, offset};
 }
 
+
 std::string string(Instructions &ins) {
-    const std::ostringstream oss;
+    std::stringstream oss;
     auto i{0};
     while (i < ins.size()) {
         try {
             const auto def = lookup(static_cast<uint8_t>(ins[i]));
 
             auto [operands,read] = readOperands(*def, std::vector(ins.begin() + i + 1, ins.end()));
-            std::cout << fmt::format("{:4d} {}\n", i, fmtInstructions(*def, operands));
+            oss << fmt::format("{:04d} {}\n", i, fmtInstructions(*def, operands));
             i += 1 + read;
         } catch (std::runtime_error &e) {
             fmt::print("ERROR: {}\n", e.what());

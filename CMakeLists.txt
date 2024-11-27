@@ -37,6 +37,9 @@ add_library(monkey_library STATIC
         src/token/token.cpp
         src/ast/ast.cpp
         src/code/code.cpp
+        src/object/object.cpp
+        src/object/environment.cpp
+        src/object/builtins.cpp
 )
 add_library(monkey::library ALIAS monkey_library)
 
@@ -47,6 +50,7 @@ target_include_directories(monkey_library
         ${PROJECT_SOURCE_DIR}/ast
         ${PROJECT_SOURCE_DIR}/code
         ${PROJECT_SOURCE_DIR}/token
+        ${PROJECT_SOURCE_DIR}/object
 )
 
 target_link_libraries(monkey_library PRIVATE fmt::fmt)
@@ -70,6 +74,7 @@ add_executable(unit_tests
         test/unit_tests.cpp
         test/ast_tests.cpp
         test/code_tests.cpp
+        test/object_tests.cpp
 )
 
 # Link libraries to test executable

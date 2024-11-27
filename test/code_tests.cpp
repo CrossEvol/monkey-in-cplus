@@ -1,3 +1,4 @@
+#include <iostream>
 #include <catch2/catch_test_macros.hpp>
 
 #include "../src/code/code.h"
@@ -29,11 +30,14 @@ TEST_CASE("test make", "[make]") {
         {
             OpCode::OpClosure,
             {65534, 255},
-            {static_cast<std::byte>(static_cast<uint8_t>(OpCode::OpClosure)), std::byte{255}, std::byte{254}, std::byte{255}}
+            {
+                static_cast<std::byte>(static_cast<uint8_t>(OpCode::OpClosure)), std::byte{255}, std::byte{254},
+                std::byte{255}
+            }
         }
     };
 
-    for (const auto& tt : tests) {
+    for (const auto &tt: tests) {
         Instructions instruction = make(tt.op, tt.operands);
 
         REQUIRE(instruction.size() == tt.expected.size());
@@ -54,17 +58,18 @@ TEST_CASE("test instructions string", "[instructions]") {
         make(OpCode::OpClosure, {65535, 255})
     };
 
-    std::string expected = 
-        "0000 OpAdd\n"
-        "0001 OpGetLocal 1\n"
-        "0003 OpConstant 2\n"
-        "0006 OpConstant 65535\n"
-        "0009 OpClosure 65535 255\n";
+    std::string expected =
+            "0000 OpAdd\n"
+            "0001 OpGetLocal 1\n"
+            "0003 OpConstant 2\n"
+            "0006 OpConstant 65535\n"
+            "0009 OpClosure 65535 255\n";
 
     Instructions concatted;
-    for (const auto& ins : instructions) {
+    for (const auto &ins: instructions) {
         concatted.insert(concatted.end(), ins.begin(), ins.end());
     }
+
 
     REQUIRE(string(concatted) == expected);
 }
@@ -82,10 +87,10 @@ TEST_CASE("test read operands", "[operands]") {
         {OpCode::OpClosure, {65535, 255}, 3}
     };
 
-    for (const auto& tt : tests) {
+    for (const auto &tt: tests) {
         Instructions instruction = make(tt.op, tt.operands);
-        
-        Definition* def = lookup(static_cast<uint8_t>(tt.op));
+
+        Definition *def = lookup(static_cast<uint8_t>(tt.op));
         REQUIRE(def != nullptr);
 
         Instructions ins_slice(instruction.begin() + 1, instruction.end());
@@ -99,5 +104,3 @@ TEST_CASE("test read operands", "[operands]") {
         }
     }
 }
-
-

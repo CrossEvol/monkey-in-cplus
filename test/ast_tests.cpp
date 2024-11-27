@@ -4,8 +4,9 @@
 #define CATCH_CONFIG_MAIN
 #include <iostream>
 
-
 TEST_CASE("test ast string()", "[ast]") {
+    using namespace Ast;
+
     const auto letStatement = new LetStatement(Token{LET, "let"},
                                                new Identifier({Token{IDENT, "myVar"}, "myVar"}),
                                                new Identifier({Token{IDENT, "anotherVar"}, "anotherVar"}));
