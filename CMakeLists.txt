@@ -13,16 +13,16 @@ include(FetchContent)
 
 # Declare fmt
 FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG 10.2.1
+        fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+        GIT_TAG 10.2.1
 )
 
 # Declare Catch2
 FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v3.5.2
+        Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG v3.5.2
 )
 
 # Make the libraries available
@@ -33,13 +33,18 @@ FetchContent_MakeAvailable(fmt Catch2)
 ############################################################
 
 add_library(monkey_library STATIC
-        "src/hello.cpp"
+        src/hello.cpp
+        src/token/token.cpp
+        src/ast/ast.h
+        src/ast/ast.cpp
 )
 add_library(monkey::library ALIAS monkey_library)
 
 target_include_directories(monkey_library
         PUBLIC
         ${PROJECT_SOURCE_DIR}/include
+        PRIVATE
+        ${PROJECT_SOURCE_DIR}/token
 )
 
 target_link_libraries(monkey_library PRIVATE fmt::fmt)
@@ -48,8 +53,8 @@ target_link_libraries(monkey_library PRIVATE fmt::fmt)
 # Create Main executable
 ############################################################
 
-add_executable(start_up 
-    src/main.cpp
+add_executable(start_up
+        src/main.cpp
 )
 
 # Link libraries to main executable
@@ -60,11 +65,12 @@ target_link_libraries(start_up PRIVATE monkey::library)
 ############################################################
 
 add_executable(unit_tests
-    test/unit_tests.cpp
+        test/unit_tests.cpp
+        test/ast_tests.cpp
 )
 
 # Link libraries to test executable
-target_link_libraries(unit_tests PRIVATE 
-    monkey::library
-    Catch2::Catch2WithMain
+target_link_libraries(unit_tests PRIVATE
+        monkey::library
+        Catch2::Catch2WithMain
 )
