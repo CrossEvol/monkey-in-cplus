@@ -35,8 +35,8 @@ FetchContent_MakeAvailable(fmt Catch2)
 add_library(monkey_library STATIC
         src/hello.cpp
         src/token/token.cpp
-        src/ast/ast.h
         src/ast/ast.cpp
+        src/code/code.cpp
 )
 add_library(monkey::library ALIAS monkey_library)
 
@@ -44,6 +44,8 @@ target_include_directories(monkey_library
         PUBLIC
         ${PROJECT_SOURCE_DIR}/include
         PRIVATE
+        ${PROJECT_SOURCE_DIR}/ast
+        ${PROJECT_SOURCE_DIR}/code
         ${PROJECT_SOURCE_DIR}/token
 )
 
@@ -67,6 +69,7 @@ target_link_libraries(start_up PRIVATE monkey::library)
 add_executable(unit_tests
         test/unit_tests.cpp
         test/ast_tests.cpp
+        test/code_tests.cpp
 )
 
 # Link libraries to test executable
