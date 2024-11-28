@@ -38,6 +38,40 @@ public:
         this->readChar();
     }
 
+    Lexer(const Lexer &other)
+        : input(other.input),
+          position(other.position),
+          readPosition(other.readPosition),
+          ch(other.ch) {
+    }
+
+    Lexer(Lexer &&other) noexcept
+        : input(std::move(other.input)),
+          position(other.position),
+          readPosition(other.readPosition),
+          ch(other.ch) {
+    }
+
+    Lexer & operator=(const Lexer &other) {
+        if (this == &other)
+            return *this;
+        input = other.input;
+        position = other.position;
+        readPosition = other.readPosition;
+        ch = other.ch;
+        return *this;
+    }
+
+    Lexer & operator=(Lexer &&other) noexcept {
+        if (this == &other)
+            return *this;
+        input = std::move(other.input);
+        position = other.position;
+        readPosition = other.readPosition;
+        ch = other.ch;
+        return *this;
+    }
+
     Token nextToken();
 };
 

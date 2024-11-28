@@ -4,6 +4,7 @@
 
 #ifndef AST_H
 #define AST_H
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -33,6 +34,7 @@ namespace Ast {
 
     class Expression : public Node {
     public:
+
         ~Expression() override = default;
 
         void expressionNode() {
@@ -44,14 +46,13 @@ namespace Ast {
     };
 
     class Program final : public Node {
-    private:
-        std::vector<Statement> statements;
-
     public:
+        std::vector<std::unique_ptr<Statement> > statements;
+
         ~Program() override = default;
 
-        explicit Program(const std::vector<Statement> &statements)
-            : statements(statements) {
+        explicit Program(std::vector<std::unique_ptr<Statement> > &&statements)
+            : statements(std::move(statements)) {
         }
 
         std::string tokenLiteral() override;
@@ -79,13 +80,13 @@ namespace Ast {
     class LetStatement final : public Statement {
     public:
         Token token;
-        Identifier *name;
-        Expression *value;
+        std::unique_ptr<Identifier> name;
+        std::unique_ptr<Expression> value;
 
-        LetStatement(Token token, Identifier *name, Expression *value)
+        LetStatement(Token token, std::unique_ptr<Identifier> name, std::unique_ptr<Expression> value)
             : token(std::move(token)),
               name(std::move(name)),
-              value(value) {
+              value(std::move(value)) {
         }
 
         ~LetStatement() override = default;
@@ -98,11 +99,11 @@ namespace Ast {
     class ReturnStatement final : public Statement {
     public:
         Token token;
-        Expression *returnValue;
+        std::unique_ptr<Expression> returnValue;
 
-        ReturnStatement(Token token, Expression *return_value)
+        ReturnStatement(Token token, std::unique_ptr<Expression> return_value)
             : token(std::move(token)),
-              returnValue(return_value) {
+              returnValue(std::move(return_value)) {
         }
 
         ~ReturnStatement() override = default;
@@ -115,11 +116,11 @@ namespace Ast {
     class ExpressionStatement final : public Statement {
     public:
         Token token;
-        Expression *expression;
+        std::unique_ptr<Expression> expression;
 
-        ExpressionStatement(Token token, Expression *expression)
+        ExpressionStatement(Token token, std::unique_ptr<Expression> expression)
             : token(std::move(token)),
-              expression(expression) {
+              expression(std::move(expression)) {
         }
 
         ~ExpressionStatement() override = default;
@@ -132,13 +133,17 @@ namespace Ast {
     class BlockStatement final : public Statement {
     public:
         Token token;
-        std::vector<Statement> statements;
+        std::vector<std::unique_ptr<Statement>> statements;
 
-        BlockStatement(Token token, const std::vector<Statement> &statements)
-            : token(std::move(token)),
-              statements(statements) {
-        }
-
+        BlockStatement(Token token, std::vector<std::unique_ptr<Statement>>&& statements)
+            : token(std::move(token)), statements(std::move(statements)) {}
+        
+        BlockStatement(const BlockStatement&) = delete;
+        BlockStatement& operator=(const BlockStatement&) = delete;
+        
+        BlockStatement(BlockStatement&&) = default;
+        BlockStatement& operator=(BlockStatement&&) = default;
+        
         ~BlockStatement() override = default;
 
         std::string tokenLiteral() override;
@@ -184,10 +189,10 @@ namespace Ast {
     public:
         Token token;
         std::string operator_;
-        Expression *right;
+        std::unique_ptr<Expression> right;
 
-        PrefixExpression(Token token, std::string op, Expression *right)
-            : token(std::move(token)), operator_(std::move(op)), right(right) {
+        PrefixExpression(Token token, std::string op, std::unique_ptr<Expression> right)
+            : token(std::move(token)), operator_(std::move(op)), right(std::move(right)) {
         }
 
         ~PrefixExpression() override = default;
@@ -200,12 +205,13 @@ namespace Ast {
     class InfixExpression final : public Expression {
     public:
         Token token;
-        Expression *left;
+        std::unique_ptr<Expression> left;
         std::string operator_;
-        Expression *right;
+        std::unique_ptr<Expression> right;
 
-        InfixExpression(Token token, Expression *left, std::string op, Expression *right)
-            : token(std::move(token)), left(left), operator_(std::move(op)), right(right) {
+        InfixExpression(Token token, std::unique_ptr<Expression> left, std::string op,
+                        std::unique_ptr<Expression> right)
+            : token(std::move(token)), left(std::move(left)), operator_(std::move(op)), right(std::move(right)) {
         }
 
         ~InfixExpression() override = default;
@@ -218,12 +224,18 @@ namespace Ast {
     class IfExpression final : public Expression {
     public:
         Token token;
-        Expression *condition;
-        BlockStatement *consequence;
-        BlockStatement *alternative;
+        std::unique_ptr<Expression> condition;
+        std::unique_ptr<BlockStatement> consequence;
+        std::unique_ptr<BlockStatement> alternative;
 
-        IfExpression(Token token, Expression *condition, BlockStatement *consequence, BlockStatement *alternative)
-            : token(std::move(token)), condition(condition), consequence(consequence), alternative(alternative) {
+        IfExpression(Token token,
+                     std::unique_ptr<Expression> condition,
+                     std::unique_ptr<BlockStatement> consequence,
+                     std::unique_ptr<BlockStatement> alternative)
+            : token(std::move(token)),
+              condition(std::move(condition)),
+              consequence(std::move(consequence)),
+              alternative(std::move(alternative)) {
         }
 
         ~IfExpression() override = default;
@@ -237,10 +249,12 @@ namespace Ast {
     public:
         Token token;
         std::vector<Identifier> parameters;
-        BlockStatement *body;
+        std::unique_ptr<BlockStatement> body;
 
-        FunctionLiteral(Token token, const std::vector<Identifier> &parameters, BlockStatement *body)
-            : token(std::move(token)), parameters(parameters), body(body) {
+        FunctionLiteral(Token token, std::vector<Identifier> parameters, std::unique_ptr<BlockStatement> body)
+            : token(std::move(token)),
+              parameters(std::move(parameters)),
+              body(std::move(body)) {
         }
 
         ~FunctionLiteral() override = default;
@@ -253,11 +267,15 @@ namespace Ast {
     class CallExpression final : public Expression {
     public:
         Token token;
-        Expression *function;
-        std::vector<Expression *> arguments;
+        std::unique_ptr<Expression> function;
+        std::vector<std::unique_ptr<Expression> > arguments;
 
-        CallExpression(Token token, Expression *function, const std::vector<Expression *> &arguments)
-            : token(std::move(token)), function(function), arguments(arguments) {
+        CallExpression(Token token,
+                       std::unique_ptr<Expression> function,
+                       std::vector<std::unique_ptr<Expression>>&& arguments)
+            : token(std::move(token)),
+              function(std::move(function)),
+              arguments(std::move(arguments)) {
         }
 
         ~CallExpression() override = default;
@@ -286,10 +304,10 @@ namespace Ast {
     class ArrayLiteral final : public Expression {
     public:
         Token token;
-        std::vector<Expression *> elements;
+        std::vector<std::unique_ptr<Expression> > elements;
 
-        ArrayLiteral(Token token, const std::vector<Expression *> &elements)
-            : token(std::move(token)), elements(elements) {
+        ArrayLiteral(Token token, std::vector<std::unique_ptr<Expression> > elements)
+            : token(std::move(token)), elements(std::move(elements)) {
         }
 
         ~ArrayLiteral() override = default;
@@ -302,11 +320,11 @@ namespace Ast {
     class IndexExpression final : public Expression {
     public:
         Token token;
-        Expression *left;
-        Expression *index;
+        std::unique_ptr<Expression> left;
+        std::unique_ptr<Expression> index;
 
-        IndexExpression(Token token, Expression *left, Expression *index)
-            : token(std::move(token)), left(left), index(index) {
+        IndexExpression(Token token, std::unique_ptr<Expression> left, std::unique_ptr<Expression> index)
+            : token(std::move(token)), left(std::move(left)), index(std::move(index)) {
         }
 
         ~IndexExpression() override = default;
@@ -319,11 +337,11 @@ namespace Ast {
     class HashLiteral final : public Expression {
     public:
         Token token;
-        std::map<Expression *, Expression *> pairs;
+        std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>> pairs;
 
-        HashLiteral(Token token, const std::map<Expression *, Expression *> &pairs)
-            : token(std::move(token)), pairs(pairs) {
-        }
+        HashLiteral(Token token, 
+                    std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& pairs)
+            : token(std::move(token)), pairs(std::move(pairs)) {}
 
         ~HashLiteral() override = default;
 

@@ -62,18 +62,18 @@ struct Token {
 
     Token() = default;
 
-    Token(TokenType type, std::string literal)
-        : type(std::move(type)),
-          literal(std::move(literal)) {
+    Token(const TokenType& type,const std::string& literal)
+        : type(type),
+          literal(literal) {
     }
 
-    Token(TokenType type, const std::byte ch)
-        : type(std::move(type)),
+    Token(const TokenType& type, const std::byte ch)
+        : type(type),
           literal(std::string(1, static_cast<char>(ch))) {
     }
 
-    Token(TokenType type, const char ch)
-        : type(std::move(type)),
+    Token(const TokenType& type, const char ch)
+        : type(type),
           literal(std::string(1, ch)) {
     }
 };

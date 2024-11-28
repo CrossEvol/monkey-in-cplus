@@ -9,16 +9,16 @@ using namespace Ast;
 
 std::string Program::tokenLiteral() {
     if (!this->statements.empty()) {
-        auto statement = this->statements[0];
-        return statement.tokenLiteral();
+        auto statement = std::move(this->statements[0]);
+        return statement->tokenLiteral();
     }
     return "";
 }
 
 std::string Program::string() {
     std::ostringstream oss;
-    for (auto s: this->statements) {
-        oss << s.string();
+    for (const auto& s: this->statements) {
+        oss << s->string();
     }
     return oss.str();
 }
@@ -36,11 +36,11 @@ std::string LetStatement::tokenLiteral() {
 }
 
 std::string LetStatement::string() {
-    std::ostringstream oss;
+    std::stringstream oss;
     oss << this->tokenLiteral() << " ";
     oss << this->name->string();
     oss << " = ";
-    if (this->value != nullptr) {
+    if (this->value) {
         oss << this->value->string();
     }
     oss << ";";
@@ -54,7 +54,7 @@ std::string ReturnStatement::tokenLiteral() {
 std::string ReturnStatement::string() {
     std::ostringstream oss;
     oss << this->tokenLiteral() << " ";
-    if (this->returnValue != nullptr) {
+    if (this->returnValue) {
         oss << this->returnValue->string();
     }
     oss << ";";
@@ -66,7 +66,7 @@ std::string ExpressionStatement::tokenLiteral() {
 }
 
 std::string ExpressionStatement::string() {
-    if (this->expression != nullptr) {
+    if (this->expression) {
         return this->expression->string();
     }
     return "";
@@ -77,11 +77,11 @@ std::string BlockStatement::tokenLiteral() {
 }
 
 std::string BlockStatement::string() {
-    std::ostringstream oss;
-    for (auto s: this->statements) {
-        oss << s.string();
+    std::string out;
+    for (const auto& s : this->statements) {
+        out += s->string();
     }
-    return oss.str();
+    return out;
 }
 
 std::string Boolean::tokenLiteral() {
@@ -108,7 +108,7 @@ std::string PrefixExpression::string() {
     std::ostringstream oss;
     oss << "(";
     oss << this->operator_;
-    if (this->right != nullptr) {
+    if (this->right) {
         oss << this->right->string();
     }
     oss << ")";
@@ -122,11 +122,11 @@ std::string InfixExpression::tokenLiteral() {
 std::string InfixExpression::string() {
     std::ostringstream oss;
     oss << "(";
-    if (this->left != nullptr) {
+    if (this->left) {
         oss << this->left->string();
     }
     oss << " " << this->operator_ << " ";
-    if (this->right != nullptr) {
+    if (this->right) {
         oss << this->right->string();
     }
     oss << ")";
@@ -140,14 +140,14 @@ std::string IfExpression::tokenLiteral() {
 std::string IfExpression::string() {
     std::ostringstream oss;
     oss << "if";
-    if (this->condition != nullptr) {
+    if (this->condition) {
         oss << this->condition->string();
     }
     oss << " ";
-    if (this->consequence != nullptr) {
+    if (this->consequence) {
         oss << this->consequence->string();
     }
-    if (this->alternative != nullptr) {
+    if (this->alternative) {
         oss << "else ";
         oss << this->alternative->string();
     }
@@ -178,7 +178,7 @@ std::string FunctionLiteral::string() {
     }
 
     oss << ") ";
-    if (this->body != nullptr) {
+    if (this->body) {
         oss << this->body->string();
     }
     return oss.str();
@@ -198,7 +198,7 @@ std::string CallExpression::string() {
 
     oss << "(";
 
-    for (const auto argument: this->arguments) {
+    for (const auto& argument: this->arguments) {
         if (argument != nullptr) {
             args.push_back(argument->string());
         }
@@ -232,7 +232,7 @@ std::string ArrayLiteral::string() {
     std::vector<std::string> elements;
 
     for (const auto &el: this->elements) {
-        if (el != nullptr) {
+        if (el) {
             elements.push_back(el->string());
         }
     }
@@ -256,11 +256,11 @@ std::string IndexExpression::tokenLiteral() {
 std::string IndexExpression::string() {
     std::ostringstream oss;
     oss << "(";
-    if (this->left != nullptr) {
+    if (this->left) {
         oss << this->left->string();
     }
     oss << "[";
-    if (this->index != nullptr) {
+    if (this->index) {
         oss << this->index->string();
     }
     oss << "])";
