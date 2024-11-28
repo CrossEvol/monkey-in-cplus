@@ -6,6 +6,8 @@
 #define TOKEN_H
 #include <map>
 #include <string>
+#include <utility>
+#include <vector>
 
 using TokenType = std::string;
 
@@ -57,6 +59,23 @@ namespace TokenType_t {
 struct Token {
     TokenType type;
     std::string literal;
+
+    Token() = default;
+
+    Token(TokenType type, std::string literal)
+        : type(std::move(type)),
+          literal(std::move(literal)) {
+    }
+
+    Token(TokenType type, const std::byte ch)
+        : type(std::move(type)),
+          literal(std::string(1, static_cast<char>(ch))) {
+    }
+
+    Token(TokenType type, const char ch)
+        : type(std::move(type)),
+          literal(std::string(1, ch)) {
+    }
 };
 
 using namespace TokenType_t;

@@ -40,6 +40,7 @@ add_library(monkey_library STATIC
         src/object/object.cpp
         src/object/environment.cpp
         src/object/builtins.cpp
+        src/lexer/lexer.cpp
 )
 add_library(monkey::library ALIAS monkey_library)
 
@@ -49,8 +50,9 @@ target_include_directories(monkey_library
         PRIVATE
         ${PROJECT_SOURCE_DIR}/ast
         ${PROJECT_SOURCE_DIR}/code
-        ${PROJECT_SOURCE_DIR}/token
+        ${PROJECT_SOURCE_DIR}/lexer
         ${PROJECT_SOURCE_DIR}/object
+        ${PROJECT_SOURCE_DIR}/token
 )
 
 target_link_libraries(monkey_library PRIVATE fmt::fmt)
@@ -75,6 +77,7 @@ add_executable(unit_tests
         test/ast_tests.cpp
         test/code_tests.cpp
         test/object_tests.cpp
+        test/lexer_tests.cpp
 )
 
 # Link libraries to test executable
