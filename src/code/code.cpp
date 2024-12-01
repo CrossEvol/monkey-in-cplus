@@ -23,7 +23,7 @@ void putUint16BE(Instructions &ins, const size_t offset, const uint16_t value) {
     ins[offset + 1] = static_cast<std::byte>(value & 0xFF);
 }
 
-Instructions make(OpCode op, const std::vector<int> &operands) {
+Instructions Code::make(OpCode op, const std::vector<int> &operands) {
     const auto iter = definitions.find(op);
     if (iter == definitions.end()) {
         return {};

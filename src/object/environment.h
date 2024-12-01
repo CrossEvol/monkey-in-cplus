@@ -26,7 +26,7 @@ public:
         this->outer = outer;
     }
 
-    Object set(const std::string &name, Object &val);
+    Object* set(const std::string &name, Object &val);
 
     std::pair<Object*, bool> get(const std::string &name);
 };

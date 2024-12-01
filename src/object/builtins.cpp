@@ -100,8 +100,10 @@ Error *newError(const std::string &format, Args &&... args) {
 }
 
 Builtin *getBuiltinByName(const std::string &name) {
-    if (builtins.find(name) == builtins.end()) {
-        return nullptr;
+    for (auto [fst,snd] : builtins) {
+        if (fst == name) {
+            return snd;
+        }
     }
-    return builtins.at(name);
+    return nullptr;
 }

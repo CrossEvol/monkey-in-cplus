@@ -700,7 +700,7 @@ TEST_CASE("Test parsing hash literals with string keys", "[parser]") {
     INFO("hash.pairs has wrong length. expected=" << expected.size() << ", got=" << hash->pairs.size());
     REQUIRE(hash->pairs.size() == expected.size());
 
-    for (const auto& pair : hash->pairs) {
+    for (const auto& [hash_key, pair] : hash->pairs) {
         auto key = dynamic_cast<Ast::StringLiteral*>(pair.first.get());
         INFO("key is not StringLiteral. got=" << typeid(pair.first.get()).name());
         REQUIRE(key != nullptr);
@@ -732,7 +732,7 @@ TEST_CASE("Test parsing hash literals with boolean keys", "[parser]") {
 
     REQUIRE(hash->pairs.size() == expected.size());
 
-    for (const auto& pair : hash->pairs) {
+    for (const auto& [hash_key, pair] : hash->pairs) {
         auto key = dynamic_cast<Ast::Boolean*>(pair.first.get());
         REQUIRE(key != nullptr);
 
@@ -763,7 +763,7 @@ TEST_CASE("Test parsing hash literals with integer keys", "[parser]") {
 
     REQUIRE(hash->pairs.size() == expected.size());
 
-    for (const auto& pair : hash->pairs) {
+    for (const auto& [hash_key, pair] : hash->pairs) {
         auto key = dynamic_cast<Ast::IntegerLiteral*>(pair.first.get());
         REQUIRE(key != nullptr);
 
@@ -803,7 +803,7 @@ TEST_CASE("Test parsing hash literals with expressions", "[parser]") {
         {"three", {15, "/", 5}}
     };
 
-    for (const auto& pair : hash->pairs) {
+    for (const auto& [hash_key, pair] : hash->pairs) {
         auto key = dynamic_cast<Ast::StringLiteral*>(pair.first.get());
         INFO("key is not StringLiteral. got=" << typeid(pair.first.get()).name());
         REQUIRE(key != nullptr);

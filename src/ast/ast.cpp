@@ -7,6 +7,10 @@
 
 using namespace Ast;
 
+std::string Statement::string() {
+    return {};
+}
+
 std::string Program::tokenLiteral() {
     if (!this->statements.empty()) {
         auto statement = std::move(this->statements[0]);
@@ -17,7 +21,7 @@ std::string Program::tokenLiteral() {
 
 std::string Program::string() {
     std::ostringstream oss;
-    for (const auto& s: this->statements) {
+    for (const auto &s: this->statements) {
         oss << s->string();
     }
     return oss.str();
@@ -78,7 +82,7 @@ std::string BlockStatement::tokenLiteral() {
 
 std::string BlockStatement::string() {
     std::string out;
-    for (const auto& s : this->statements) {
+    for (const auto &s: this->statements) {
         out += s->string();
     }
     return out;
@@ -198,7 +202,7 @@ std::string CallExpression::string() {
 
     oss << "(";
 
-    for (const auto& argument: this->arguments) {
+    for (const auto &argument: this->arguments) {
         if (argument != nullptr) {
             args.push_back(argument->string());
         }
@@ -275,10 +279,8 @@ std::string HashLiteral::string() {
     std::ostringstream oss;
     std::vector<std::string> pairs;
 
-    for (const auto &[fst, snd]: this->pairs) {
-        if (fst != nullptr && snd != nullptr) {
-            pairs.push_back(fst->string() + ":" + snd->string());
-        }
+    for (const auto &[_, pair]: this->pairs) {
+        pairs.push_back(pair.first->string() + ":" + pair.second->string());
     }
 
     oss << "{";
@@ -291,4 +293,13 @@ std::string HashLiteral::string() {
     oss << "}";
 
     return oss.str();
+}
+
+Expression* HashLiteral::get( Expression &left) {
+    const auto hash_key = std::to_string(std::hash<std::string>{}(left.string()));
+    if(this->pairs.find(hash_key) == this->pairs.end()) {
+        return nullptr;
+    }
+    // TODO: should use move here ?
+    return this->pairs.at(hash_key).second.get();
 }

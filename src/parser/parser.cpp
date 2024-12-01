@@ -3,6 +3,7 @@
 //
 
 #include "parser.h"
+#include <functional>
 
 #include "fmt/format.h"
 
@@ -335,7 +336,7 @@ std::unique_ptr<Ast::Expression> Parser::parseIndexExpression(std::unique_ptr<As
 
 std::unique_ptr<Ast::Expression> Parser::parseHashLiteral() {
     auto token = this->curToken;
-    std::vector<std::pair<std::unique_ptr<Ast::Expression>, std::unique_ptr<Ast::Expression>>> pairs;
+    std::map<std::string, std::pair<std::unique_ptr<Ast::Expression>, std::unique_ptr<Ast::Expression> > > pairs;
 
     while (!this->peekTokenIs(RBRACE)) {
         this->nextToken();
@@ -354,7 +355,9 @@ std::unique_ptr<Ast::Expression> Parser::parseHashLiteral() {
             return nullptr;
         }
 
-        pairs.push_back(std::make_pair(std::move(key), std::move(value)));
+        auto hash_key = std::to_string(std::hash<std::string>{}(key->string()));
+        auto value_pair = std::make_pair(std::move(key), std::move(value));
+        pairs.emplace(hash_key, std::move(value_pair));
 
         if (!this->peekTokenIs(RBRACE) && !this->expectPeek(COMMA)) {
             return nullptr;

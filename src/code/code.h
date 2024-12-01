@@ -11,7 +11,7 @@
 
 using Instructions = std::vector<std::byte>;
 
-enum class OpCode {
+enum class OpCode:unsigned char {
     OpConstant,
 
     OpAdd,
@@ -116,7 +116,9 @@ std::string string(Instructions &ins);
 
 std::string fmtInstructions(Definition &def, std::vector<int> operands);
 
-Instructions make(OpCode op, const std::vector<int> &operands);
+namespace Code {
+    Instructions make(OpCode op, const std::vector<int> &operands);
+}
 
 std::pair<std::vector<int>, int> readOperands(const Definition &def, const Instructions &ins);
 

@@ -8,9 +8,9 @@
 
 #include "fmt/format.h"
 
-Object Environment::set(const std::string &name, Object &val) {
+Object* Environment::set(const std::string &name, Object &val) {
     this->store[name] = std::make_shared<Object *>(&val);
-    return val;
+    return &val;
 }
 
 std::pair<Object *, bool> Environment::get(const std::string &name) {

@@ -79,8 +79,8 @@ std::string String::inspect() {
 
 HashKey String::hash_key() {
     // Using std::hash for string hashing
-    std::hash<std::string> hasher;
-    return {this->type(), hasher(value)};
+    constexpr std::hash<std::string> std_hash;
+    return {this->type(), std_hash(value)};
 }
 
 ObjectType Builtin::type() {

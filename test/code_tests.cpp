@@ -38,7 +38,7 @@ TEST_CASE("test make", "[make]") {
     };
 
     for (const auto &tt: tests) {
-        Instructions instruction = make(tt.op, tt.operands);
+        Instructions instruction = Code::make(tt.op, tt.operands);
 
         REQUIRE(instruction.size() == tt.expected.size());
 
@@ -51,11 +51,11 @@ TEST_CASE("test make", "[make]") {
 
 TEST_CASE("test instructions string", "[instructions]") {
     std::vector<Instructions> instructions = {
-        make(OpCode::OpAdd, {}),
-        make(OpCode::OpGetLocal, {1}),
-        make(OpCode::OpConstant, {2}),
-        make(OpCode::OpConstant, {65535}),
-        make(OpCode::OpClosure, {65535, 255})
+        Code::make(OpCode::OpAdd, {}),
+        Code::make(OpCode::OpGetLocal, {1}),
+        Code::make(OpCode::OpConstant, {2}),
+        Code::make(OpCode::OpConstant, {65535}),
+        Code::make(OpCode::OpClosure, {65535, 255})
     };
 
     std::string expected =
@@ -88,7 +88,7 @@ TEST_CASE("test read operands", "[operands]") {
     };
 
     for (const auto &tt: tests) {
-        Instructions instruction = make(tt.op, tt.operands);
+        Instructions instruction = Code::make(tt.op, tt.operands);
 
         Definition *def = lookup(static_cast<uint8_t>(tt.op));
         REQUIRE(def != nullptr);

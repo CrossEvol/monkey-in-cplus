@@ -43,6 +43,8 @@ add_library(monkey_library STATIC
         src/lexer/lexer.cpp
         src/parser/parser.cpp
         src/parser/parser_tracing.cpp
+        src/compiler/compiler.cpp
+        src/compiler/symbol_table.cpp
 )
 add_library(monkey::library ALIAS monkey_library)
 
@@ -52,6 +54,7 @@ target_include_directories(monkey_library
         PRIVATE
         ${PROJECT_SOURCE_DIR}/ast
         ${PROJECT_SOURCE_DIR}/code
+        ${PROJECT_SOURCE_DIR}/compiler
         ${PROJECT_SOURCE_DIR}/lexer
         ${PROJECT_SOURCE_DIR}/parser
         ${PROJECT_SOURCE_DIR}/object
@@ -82,6 +85,8 @@ add_executable(unit_tests
         test/object_tests.cpp
         test/lexer_tests.cpp
         test/parser_tests.cpp
+        test/compiler_tests.cpp
+        test/symbol_table_tests.cpp
 )
 
 # Link libraries to test executable

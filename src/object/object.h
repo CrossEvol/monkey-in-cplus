@@ -58,18 +58,16 @@ class Hashable {
 public:
     virtual ~Hashable() = default;
 
-    virtual HashKey hash_key() {
-        return {};
-    };
+    virtual HashKey hash_key() = 0;
 };
 
 class Object {
 public:
     virtual ~Object() = default;
 
-    virtual ObjectType type() { return "???"; };
+    virtual ObjectType type() = 0;
 
-    virtual std::string inspect() { return "???"; };
+    virtual std::string inspect() = 0;
 };
 
 class Integer final : public Object, Hashable {
@@ -241,7 +239,7 @@ public:
     int numLocals;
     int numParameters;
 
-    CompiledFunction(Instructions instructions, int num_locals, int num_parameters)
+    CompiledFunction(Instructions instructions, const int num_locals, const int num_parameters)
         : instructions(std::move(instructions)),
           numLocals(num_locals),
           numParameters(num_parameters) {

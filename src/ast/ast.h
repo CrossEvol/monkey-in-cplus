@@ -15,34 +15,33 @@ namespace Ast {
     public:
         virtual ~Node() = default;
 
-        virtual std::string tokenLiteral() { return "???"; }
+        virtual std::string tokenLiteral() = 0;
 
-        virtual std::string string() { return "???"; }
+        virtual std::string string() =0;
     };
 
-    class Statement : public Node {
+    class Statement : virtual public Node {
     public:
         ~Statement() override = default;
 
         void statementNode() {
         };
 
-        virtual std::string tokenLiteral() { return "???"; }
+        std::string tokenLiteral() override = 0;
 
-        virtual std::string string() { return "???"; }
+        std::string string() override;
     };
 
-    class Expression : public Node {
+    class Expression : virtual public Node {
     public:
-
         ~Expression() override = default;
 
         void expressionNode() {
         };
 
-        virtual std::string tokenLiteral() { return "???"; }
+        std::string tokenLiteral() override =0;
 
-        virtual std::string string() { return "???"; }
+        std::string string() override = 0;
     };
 
     class Program final : public Node {
@@ -133,17 +132,20 @@ namespace Ast {
     class BlockStatement final : public Statement {
     public:
         Token token;
-        std::vector<std::unique_ptr<Statement>> statements;
+        std::vector<std::unique_ptr<Statement> > statements;
 
-        BlockStatement(Token token, std::vector<std::unique_ptr<Statement>>&& statements)
-            : token(std::move(token)), statements(std::move(statements)) {}
-        
-        BlockStatement(const BlockStatement&) = delete;
-        BlockStatement& operator=(const BlockStatement&) = delete;
-        
-        BlockStatement(BlockStatement&&) = default;
-        BlockStatement& operator=(BlockStatement&&) = default;
-        
+        BlockStatement(Token token, std::vector<std::unique_ptr<Statement> > &&statements)
+            : token(std::move(token)), statements(std::move(statements)) {
+        }
+
+        BlockStatement(const BlockStatement &) = delete;
+
+        BlockStatement &operator=(const BlockStatement &) = delete;
+
+        BlockStatement(BlockStatement &&) = default;
+
+        BlockStatement &operator=(BlockStatement &&) = default;
+
         ~BlockStatement() override = default;
 
         std::string tokenLiteral() override;
@@ -272,7 +274,7 @@ namespace Ast {
 
         CallExpression(Token token,
                        std::unique_ptr<Expression> function,
-                       std::vector<std::unique_ptr<Expression>>&& arguments)
+                       std::vector<std::unique_ptr<Expression> > &&arguments)
             : token(std::move(token)),
               function(std::move(function)),
               arguments(std::move(arguments)) {
@@ -337,17 +339,21 @@ namespace Ast {
     class HashLiteral final : public Expression {
     public:
         Token token;
-        std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>> pairs;
+        std::map<std::string, std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression> > > pairs;
 
-        HashLiteral(Token token, 
-                    std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& pairs)
-            : token(std::move(token)), pairs(std::move(pairs)) {}
+        HashLiteral(Token token,
+                    std::map<std::string, std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression> > > &&
+                    pairs)
+            : token(std::move(token)), pairs(std::move(pairs)) {
+        }
 
         ~HashLiteral() override = default;
 
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        Expression *get(Expression &left);
     };
 }
 

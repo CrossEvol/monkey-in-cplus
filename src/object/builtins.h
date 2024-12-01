@@ -11,19 +11,19 @@
 
 #include "object.h"
 
-Object* monkey_len(const std::vector<std::shared_ptr<Object>> &args);
+Object *monkey_len(const std::vector<std::shared_ptr<Object> > &args);
 
-Object* monkey_puts(const std::vector<std::shared_ptr<Object>> &args);
+Object *monkey_puts(const std::vector<std::shared_ptr<Object> > &args);
 
-Object* monkey_first(const std::vector<std::shared_ptr<Object>> &args);
+Object *monkey_first(const std::vector<std::shared_ptr<Object> > &args);
 
-Object* monkey_last(const std::vector<std::shared_ptr<Object>> &args);
+Object *monkey_last(const std::vector<std::shared_ptr<Object> > &args);
 
-Object* monkey_rest(const std::vector<std::shared_ptr<Object>> &args);
+Object *monkey_rest(const std::vector<std::shared_ptr<Object> > &args);
 
-Object* monkey_push(const std::vector<std::shared_ptr<Object>> &args);
+Object *monkey_push(const std::vector<std::shared_ptr<Object> > &args);
 
-inline std::map<std::string, Builtin *> builtins = {
+inline std::vector<std::pair<std::string, Builtin *> > builtins = {
     {"len", new Builtin(&monkey_len)},
     {"puts", new Builtin(&monkey_puts)},
     {"first", new Builtin(&monkey_first)},
