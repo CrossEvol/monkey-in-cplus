@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "fmt/format.h"
+#include "../src/common/common.h"
 
 CompilationScope &Compiler::currentScope() const {
     return *this->scopes[this->scopeIndex];

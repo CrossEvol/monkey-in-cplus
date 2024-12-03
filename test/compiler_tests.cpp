@@ -10,12 +10,15 @@
 #include "../src/code/code.h"
 #include "../src/lexer/lexer.h"
 #include "../src/parser/parser.h"
+#include "common_suite.h"
 
 using namespace Ast;
 
 Instructions concatInstructions(const std::vector<Instructions> &s);
 
-std::unique_ptr<Program> parse(const std::string &input);
+namespace CompilerTest {
+    std::unique_ptr<Program> parse(const std::string &input);
+}
 
 TEST_CASE("TestCompilerScopes", "[compiler]") {
     auto compiler = Compiler();
@@ -77,14 +80,6 @@ Instructions concatInstructions(const std::vector<Instructions> &s) {
     return out;
 }
 
-template<class... Ts>
-struct overloaded : Ts... {
-    using Ts::operator()...;
-};
-
-template<class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
-
 void testConstants(const std::vector<std::variant<int64_t, std::string, std::vector<Instructions> > > &expected,
                    const std::vector<Object *> &actual) {
     REQUIRE(expected.size() == actual.size());
@@ -112,7 +107,7 @@ void testConstants(const std::vector<std::variant<int64_t, std::string, std::vec
 
 void runCompilerTests(const std::vector<CompilerTestCase> &tests) {
     for (const auto &tt: tests) {
-        auto program = parse(tt.input);
+        auto program = CompilerTest::parse(tt.input);
 
         auto compiler = Compiler();
         compiler.compile(program.get());
@@ -124,12 +119,14 @@ void runCompilerTests(const std::vector<CompilerTestCase> &tests) {
     }
 }
 
-std::unique_ptr<Program> parse(const std::string &input) {
-    // This function should parse the input string into an AST.
-    Lexer l(input);
-    Parser p(std::move(l));
-    auto program = p.parseProgram();
-    return program;
+namespace CompilerTest {
+    std::unique_ptr<Program> parse(const std::string &input) {
+        // This function should parse the input string into an AST.
+        Lexer l(input);
+        Parser p(std::move(l));
+        auto program = p.parseProgram();
+        return program;
+    }
 }
 
 TEST_CASE("TestIntegerArithmetic", "[compiler]") {
@@ -294,7 +291,7 @@ TEST_CASE("TestConditionals", "[compiler]") {
     std::vector<CompilerTestCase> tests = {
         {
             "if (true) { 10 }; 3333;",
-            {10, 3333},  // expectedConstants
+            {10, 3333}, // expectedConstants
             {
                 // 0000
                 Code::make(OpCode::OpTrue, {}),
@@ -320,6 +317,28 @@ TEST_CASE("TestConditionals", "[compiler]") {
             {
                 // 0000
                 Code::make(OpCode::OpTrue, {}),
+                // 0001
+                Code::make(OpCode::OpJumpNotTruthy, {10}),
+                // 0004
+                Code::make(OpCode::OpConstant, {0}),
+                // 0007
+                Code::make(OpCode::OpJump, {13}),
+                // 0010
+                Code::make(OpCode::OpConstant, {1}),
+                // 0013
+                Code::make(OpCode::OpPop, {}),
+                // 0014
+                Code::make(OpCode::OpConstant, {2}),
+                // 0017
+                Code::make(OpCode::OpPop, {})
+            }
+        },
+        {
+            "if (false) { 10 } else { 20 }; 3333;",
+            {10, 20, 3333},
+            {
+                // 0000
+                Code::make(OpCode::OpFalse, {}),
                 // 0001
                 Code::make(OpCode::OpJumpNotTruthy, {10}),
                 // 0004
@@ -384,12 +403,14 @@ TEST_CASE("TestFunctions", "[compiler]") {
     std::vector<CompilerTestCase> tests = {
         {
             "fn() { return 5 + 10 }",
-            {5, 10, std::vector<Instructions>{
-                Code::make(OpCode::OpConstant, {0}),
-                Code::make(OpCode::OpConstant, {1}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                5, 10, std::vector<Instructions>{
+                    Code::make(OpCode::OpConstant, {0}),
+                    Code::make(OpCode::OpConstant, {1}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpClosure, {2, 0}),
                 Code::make(OpCode::OpPop, {})
@@ -397,12 +418,14 @@ TEST_CASE("TestFunctions", "[compiler]") {
         },
         {
             "fn() { 5 + 10 }",
-            {5, 10, std::vector<Instructions>{
-                Code::make(OpCode::OpConstant, {0}),
-                Code::make(OpCode::OpConstant, {1}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                5, 10, std::vector<Instructions>{
+                    Code::make(OpCode::OpConstant, {0}),
+                    Code::make(OpCode::OpConstant, {1}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpClosure, {2, 0}),
                 Code::make(OpCode::OpPop, {})
@@ -410,12 +433,14 @@ TEST_CASE("TestFunctions", "[compiler]") {
         },
         {
             "fn() { 1; 2 }",
-            {1, 2, std::vector<Instructions>{
-                Code::make(OpCode::OpConstant, {0}),
-                Code::make(OpCode::OpPop, {}),
-                Code::make(OpCode::OpConstant, {1}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                1, 2, std::vector<Instructions>{
+                    Code::make(OpCode::OpConstant, {0}),
+                    Code::make(OpCode::OpPop, {}),
+                    Code::make(OpCode::OpConstant, {1}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpClosure, {2, 0}),
                 Code::make(OpCode::OpPop, {})
@@ -430,7 +455,7 @@ TEST_CASE("TestStringExpressions", "[compiler]") {
     std::vector<CompilerTestCase> tests = {
         {
             "\"monkey\"",
-            {"monkey"},  // expectedConstants
+            {"monkey"}, // expectedConstants
             {
                 Code::make(OpCode::OpConstant, {0}),
                 Code::make(OpCode::OpPop, {})
@@ -455,7 +480,7 @@ TEST_CASE("TestArrayLiterals", "[compiler]") {
     std::vector<CompilerTestCase> tests = {
         {
             "[]",
-            {},  // expectedConstants
+            {}, // expectedConstants
             {
                 Code::make(OpCode::OpArray, {0}),
                 Code::make(OpCode::OpPop, {})
@@ -498,7 +523,7 @@ TEST_CASE("TestHashLiterals", "[compiler]") {
     std::vector<CompilerTestCase> tests = {
         {
             "{}",
-            {},  // expectedConstants
+            {}, // expectedConstants
             {
                 Code::make(OpCode::OpHash, {0}),
                 Code::make(OpCode::OpPop, {})
@@ -543,10 +568,12 @@ TEST_CASE("TestLetStatementScopes", "[compiler]") {
     std::vector<CompilerTestCase> tests = {
         {
             "let num = 55;\nfn() { num }",
-            {55, std::vector<Instructions>{
-                Code::make(OpCode::OpGetGlobal, {0}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                55, std::vector<Instructions>{
+                    Code::make(OpCode::OpGetGlobal, {0}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpConstant, {0}),
                 Code::make(OpCode::OpSetGlobal, {0}),
@@ -556,12 +583,14 @@ TEST_CASE("TestLetStatementScopes", "[compiler]") {
         },
         {
             "fn() {\n  let num = 55;\n  num\n}",
-            {55, std::vector<Instructions>{
-                Code::make(OpCode::OpConstant, {0}),
-                Code::make(OpCode::OpSetLocal, {0}),
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                55, std::vector<Instructions>{
+                    Code::make(OpCode::OpConstant, {0}),
+                    Code::make(OpCode::OpSetLocal, {0}),
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpClosure, {1, 0}),
                 Code::make(OpCode::OpPop, {})
@@ -569,16 +598,18 @@ TEST_CASE("TestLetStatementScopes", "[compiler]") {
         },
         {
             "fn() {\n  let a = 55;\n  let b = 77;\n  a + b\n}",
-            {55, 77, std::vector<Instructions>{
-                Code::make(OpCode::OpConstant, {0}),
-                Code::make(OpCode::OpSetLocal, {0}),
-                Code::make(OpCode::OpConstant, {1}),
-                Code::make(OpCode::OpSetLocal, {1}),
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpGetLocal, {1}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                55, 77, std::vector<Instructions>{
+                    Code::make(OpCode::OpConstant, {0}),
+                    Code::make(OpCode::OpSetLocal, {0}),
+                    Code::make(OpCode::OpConstant, {1}),
+                    Code::make(OpCode::OpSetLocal, {1}),
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpGetLocal, {1}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpClosure, {2, 0}),
                 Code::make(OpCode::OpPop, {})
@@ -608,12 +639,14 @@ TEST_CASE("TestBuiltins", "[compiler]") {
         },
         {
             "fn() { len([]) }",
-            {std::vector<Instructions>{
-                Code::make(OpCode::OpGetBuiltin, {0}),
-                Code::make(OpCode::OpArray, {0}),
-                Code::make(OpCode::OpCall, {1}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                std::vector<Instructions>{
+                    Code::make(OpCode::OpGetBuiltin, {0}),
+                    Code::make(OpCode::OpArray, {0}),
+                    Code::make(OpCode::OpCall, {1}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpClosure, {0, 0}),
                 Code::make(OpCode::OpPop, {})
@@ -628,16 +661,19 @@ TEST_CASE("TestClosures", "[compiler]") {
     std::vector<CompilerTestCase> tests = {
         {
             "fn(a) {\n  fn(b) {\n    a + b\n  }\n}",
-            {std::vector<Instructions>{
-                Code::make(OpCode::OpGetFree, {0}),
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpReturnValue, {})
-            }, std::vector<Instructions>{
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpClosure, {0, 1}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                std::vector<Instructions>{
+                    Code::make(OpCode::OpGetFree, {0}),
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpReturnValue, {})
+                },
+                std::vector<Instructions>{
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpClosure, {0, 1}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpClosure, {1, 0}),
                 Code::make(OpCode::OpPop, {})
@@ -645,23 +681,27 @@ TEST_CASE("TestClosures", "[compiler]") {
         },
         {
             "fn(a) {\n  fn(b) {\n    fn(c) {\n      a + b + c\n    }\n  }\n}",
-            {std::vector<Instructions>{
-                Code::make(OpCode::OpGetFree, {0}),
-                Code::make(OpCode::OpGetFree, {1}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpReturnValue, {})
-            }, std::vector<Instructions>{
-                Code::make(OpCode::OpGetFree, {0}),
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpClosure, {0, 2}),
-                Code::make(OpCode::OpReturnValue, {})
-            }, std::vector<Instructions>{
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpClosure, {1, 1}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                std::vector<Instructions>{
+                    Code::make(OpCode::OpGetFree, {0}),
+                    Code::make(OpCode::OpGetFree, {1}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpReturnValue, {})
+                },
+                std::vector<Instructions>{
+                    Code::make(OpCode::OpGetFree, {0}),
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpClosure, {0, 2}),
+                    Code::make(OpCode::OpReturnValue, {})
+                },
+                std::vector<Instructions>{
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpClosure, {1, 1}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpClosure, {2, 0}),
                 Code::make(OpCode::OpPop, {})
@@ -669,31 +709,35 @@ TEST_CASE("TestClosures", "[compiler]") {
         },
         {
             "let global = 55;\nfn() {\n  let a = 66;\n  fn() {\n    let b = 77;\n    fn() {\n      let c = 88;\n      global + a + b + c;\n    }\n  }\n}",
-            {55, 66, 77, 88, std::vector<Instructions>{
-                Code::make(OpCode::OpConstant, {3}),
-                Code::make(OpCode::OpSetLocal, {0}),
-                Code::make(OpCode::OpGetGlobal, {0}),
-                Code::make(OpCode::OpGetFree, {0}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpGetFree, {1}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpAdd, {}),
-                Code::make(OpCode::OpReturnValue, {})
-            }, std::vector<Instructions>{
-                Code::make(OpCode::OpConstant, {2}),
-                Code::make(OpCode::OpSetLocal, {0}),
-                Code::make(OpCode::OpGetFree, {0}),
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpClosure, {4, 2}),
-                Code::make(OpCode::OpReturnValue, {})
-            }, std::vector<Instructions>{
-                Code::make(OpCode::OpConstant, {1}),
-                Code::make(OpCode::OpSetLocal, {0}),
-                Code::make(OpCode::OpGetLocal, {0}),
-                Code::make(OpCode::OpClosure, {5, 1}),
-                Code::make(OpCode::OpReturnValue, {})
-            }},
+            {
+                55, 66, 77, 88, std::vector<Instructions>{
+                    Code::make(OpCode::OpConstant, {3}),
+                    Code::make(OpCode::OpSetLocal, {0}),
+                    Code::make(OpCode::OpGetGlobal, {0}),
+                    Code::make(OpCode::OpGetFree, {0}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpGetFree, {1}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpAdd, {}),
+                    Code::make(OpCode::OpReturnValue, {})
+                },
+                std::vector<Instructions>{
+                    Code::make(OpCode::OpConstant, {2}),
+                    Code::make(OpCode::OpSetLocal, {0}),
+                    Code::make(OpCode::OpGetFree, {0}),
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpClosure, {4, 2}),
+                    Code::make(OpCode::OpReturnValue, {})
+                },
+                std::vector<Instructions>{
+                    Code::make(OpCode::OpConstant, {1}),
+                    Code::make(OpCode::OpSetLocal, {0}),
+                    Code::make(OpCode::OpGetLocal, {0}),
+                    Code::make(OpCode::OpClosure, {5, 1}),
+                    Code::make(OpCode::OpReturnValue, {})
+                }
+            },
             {
                 Code::make(OpCode::OpConstant, {0}),
                 Code::make(OpCode::OpSetGlobal, {0}),

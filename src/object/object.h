@@ -70,7 +70,7 @@ public:
     virtual std::string inspect() = 0;
 };
 
-class Integer final : public Object, Hashable {
+class Integer final : public Object, public Hashable {
 public:
     int64_t value;
 
@@ -103,16 +103,18 @@ public:
     HashKey hash_key() override;
 };
 
-class Null final : public Object {
-public:
-    Null() = default;
+namespace OBJ {
+    class Null final : public Object {
+    public:
+        Null() = default;
 
-    ~Null() override = default;
+        ~Null() override = default;
 
-    ObjectType type() override;
+        ObjectType type() override;
 
-    std::string inspect() override;
-};
+        std::string inspect() override;
+    };
+}
 
 class ReturnValue final : public Object {
 public:
@@ -182,7 +184,7 @@ public:
 };
 
 // You'll need to implement these types based on your needs
-using BuiltinFunction = Object*(*)(const std::vector<std::shared_ptr<Object>> &);
+using BuiltinFunction = Object*(*)(const std::vector<Object *> &);
 
 class Builtin final : public Object {
 public:
@@ -200,9 +202,9 @@ public:
 
 class Array final : public Object {
 public:
-    std::vector<std::shared_ptr<Object>> elements;
+    std::vector<Object *> elements;
 
-    explicit Array(std::vector<std::shared_ptr<Object>> elements)
+    explicit Array(std::vector<Object *> elements)
         : elements(std::move(elements)) {
     }
 
@@ -214,8 +216,15 @@ public:
 };
 
 struct HashPair {
-    std::shared_ptr<Object> key;
-    std::shared_ptr<Object> value;
+    Object *key;
+    Object *value;
+
+    HashPair() = default;
+
+    HashPair(Object &key, Object &value)
+        : key(&key),
+          value(&value) {
+    }
 };
 
 class Hash final : public Object {
@@ -239,6 +248,10 @@ public:
     int numLocals;
     int numParameters;
 
+    explicit CompiledFunction(const Instructions &instructions)
+        : instructions(instructions), numLocals(0), numParameters(0) {
+    }
+
     CompiledFunction(Instructions instructions, const int num_locals, const int num_parameters)
         : instructions(std::move(instructions)),
           numLocals(num_locals),
@@ -255,9 +268,13 @@ public:
 class Closure final : public Object {
 public:
     CompiledFunction fn;
-    std::vector<std::shared_ptr<Object> > free;
+    std::vector<Object *> free{};
 
-    Closure(const CompiledFunction &fn, const std::vector<std::shared_ptr<Object> > &free)
+    explicit Closure(const CompiledFunction &fn)
+        : fn(fn) {
+    }
+
+    Closure(const CompiledFunction &fn, const std::vector<Object *> &free)
         : fn(fn),
           free(free) {
     }

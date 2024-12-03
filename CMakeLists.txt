@@ -45,6 +45,8 @@ add_library(monkey_library STATIC
         src/parser/parser_tracing.cpp
         src/compiler/compiler.cpp
         src/compiler/symbol_table.cpp
+        src/vm/frame.cpp
+        src/vm/vm.cpp
 )
 add_library(monkey::library ALIAS monkey_library)
 
@@ -53,12 +55,14 @@ target_include_directories(monkey_library
         ${PROJECT_SOURCE_DIR}/include
         PRIVATE
         ${PROJECT_SOURCE_DIR}/ast
+        ${PROJECT_SOURCE_DIR}/common
         ${PROJECT_SOURCE_DIR}/code
         ${PROJECT_SOURCE_DIR}/compiler
         ${PROJECT_SOURCE_DIR}/lexer
         ${PROJECT_SOURCE_DIR}/parser
         ${PROJECT_SOURCE_DIR}/object
         ${PROJECT_SOURCE_DIR}/token
+        ${PROJECT_SOURCE_DIR}/vm
 )
 
 target_link_libraries(monkey_library PRIVATE fmt::fmt)
@@ -87,6 +91,8 @@ add_executable(unit_tests
         test/parser_tests.cpp
         test/compiler_tests.cpp
         test/symbol_table_tests.cpp
+        test/vm_tests.cpp
+        test/common_suite.h
 )
 
 # Link libraries to test executable

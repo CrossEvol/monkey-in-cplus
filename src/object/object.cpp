@@ -30,11 +30,11 @@ HashKey Boolean::hash_key() {
     return {this->type(), value ? 1ULL : 0ULL};
 }
 
-ObjectType Null::type() {
+ObjectType OBJ::Null::type() {
     return NULL_OBJ;
 }
 
-std::string Null::inspect() {
+std::string OBJ::Null::inspect() {
     return "null";
 }
 
@@ -97,7 +97,7 @@ ObjectType Array::type() {
 
 std::string Array::inspect() {
     std::vector<std::string> elements_str;
-    for (const auto &elem: elements) {
+    for (auto *elem: elements) {
         elements_str.push_back(elem->inspect());
     }
 

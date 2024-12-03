@@ -54,65 +54,78 @@ TEST_CASE("Environment Get and Set", "[environment]") {
 
 TEST_CASE("Builtin len function", "[builtins]") {
     SECTION("len with string") {
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<String>("hello")};
+        std::vector<Object *> args = {new String("hello")};
         auto result = monkey_len(args);
         REQUIRE(result->type() == INTEGER_OBJ);
         REQUIRE(dynamic_cast<Integer*>(result)->value == 5);
     }
 
     SECTION("len with array") {
-        std::vector<std::shared_ptr<Object>> elements = {
-            std::make_shared<Integer>(1),
-            std::make_shared<Integer>(2),
-            std::make_shared<Integer>(3)
+        std::vector<Object *> elements = {
+            new Integer(1),
+            new Integer(2),
+            new Integer(3)
         };
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(elements)};
+        std::vector<Object *> args = {new Array(elements)};
         auto result = monkey_len(args);
         REQUIRE(result->type() == INTEGER_OBJ);
         REQUIRE(dynamic_cast<Integer*>(result)->value == 3);
+
+        // Cleanup
+        delete result;
+        for (auto *arg: args) {
+            delete arg;
+        }
     }
 
     SECTION("len with wrong number of arguments") {
-        std::vector<std::shared_ptr<Object>> args = {};
+        std::vector<Object *> args = {};
         auto result = monkey_len(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
 
     SECTION("len with unsupported argument") {
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Integer>(5)};
+        std::vector<Object *> args = {new Integer(5)};
         auto result = monkey_len(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
 }
 
+
 TEST_CASE("Builtin first function", "[builtins]") {
     SECTION("first with non-empty array") {
-        std::vector<std::shared_ptr<Object>> elements = {
-            std::make_shared<Integer>(1),
-            std::make_shared<Integer>(2),
-            std::make_shared<Integer>(3)
+        std::vector<Object *> elements = {
+            new Integer(1),
+            new Integer(2),
+            new Integer(3)
         };
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(elements)};
+        std::vector<Object *> args = {new Array(elements)};
         auto result = monkey_first(args);
         REQUIRE(result->type() == INTEGER_OBJ);
         REQUIRE(dynamic_cast<Integer*>(result)->value == 1);
+
+        // Cleanup
+        delete result;
+        for (auto *arg: args) {
+            delete arg;
+        }
     }
 
     SECTION("first with empty array") {
-        std::vector<std::shared_ptr<Object>> elements = {};
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(elements)};
+        std::vector<Object *> elements = {};
+        std::vector<Object *> args = {new Array(elements)};
         auto result = monkey_first(args);
         REQUIRE(result == nullptr);
     }
 
     SECTION("first with wrong number of arguments") {
-        std::vector<std::shared_ptr<Object>> args = {};
+        std::vector<Object *> args = {};
         auto result = monkey_first(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
 
     SECTION("first with wrong type of argument") {
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Integer>(5)};
+        std::vector<Object *> args = {new Integer(5)};
         auto result = monkey_first(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
@@ -120,32 +133,32 @@ TEST_CASE("Builtin first function", "[builtins]") {
 
 TEST_CASE("Builtin last function", "[builtins]") {
     SECTION("last with non-empty array") {
-        std::vector<std::shared_ptr<Object>> elements = {
-            std::make_shared<Integer>(1),
-            std::make_shared<Integer>(2),
-            std::make_shared<Integer>(3)
+        std::vector<Object *> elements = {
+            new Integer(1),
+            new Integer(2),
+            new Integer(3),
         };
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(elements)};
+        std::vector<Object *> args = {new Array(elements)};
         auto result = monkey_last(args);
         REQUIRE(result->type() == INTEGER_OBJ);
         REQUIRE(dynamic_cast<Integer*>(result)->value == 3);
     }
 
     SECTION("last with empty array") {
-        std::vector<std::shared_ptr<Object>> elements = {};
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(elements)};
+        std::vector<Object *> elements = {};
+        std::vector<Object *> args = {new Array(elements)};
         auto result = monkey_last(args);
         REQUIRE(result == nullptr);
     }
 
     SECTION("last with wrong number of arguments") {
-        std::vector<std::shared_ptr<Object>> args = {};
+        std::vector<Object *> args = {};
         auto result = monkey_last(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
 
     SECTION("last with wrong type of argument") {
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Integer>(5)};
+        std::vector<Object *> args = {new Integer(5)};
         auto result = monkey_last(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
@@ -153,46 +166,46 @@ TEST_CASE("Builtin last function", "[builtins]") {
 
 TEST_CASE("Builtin rest function", "[builtins]") {
     SECTION("rest with non-empty array") {
-        std::vector<std::shared_ptr<Object>> elements = {
-            std::make_shared<Integer>(1),
-            std::make_shared<Integer>(2),
-            std::make_shared<Integer>(3)
+        std::vector<Object *> elements = {
+            new Integer(1),
+            new Integer(2),
+            new Integer(3),
         };
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(elements)};
+        std::vector<Object *> args = {new Array(elements)};
         auto result = monkey_rest(args);
         REQUIRE(result->type() == ARRAY_OBJ);
-        
-        auto* array_result = dynamic_cast<Array*>(result);
+
+        auto *array_result = dynamic_cast<Array *>(result);
         REQUIRE(array_result->elements.size() == 2);
-        REQUIRE(dynamic_cast<Integer*>(array_result->elements[0].get())->value == 2);
-        REQUIRE(dynamic_cast<Integer*>(array_result->elements[1].get())->value == 3);
+        REQUIRE(dynamic_cast<Integer*>(array_result->elements[0])->value == 2);
+        REQUIRE(dynamic_cast<Integer*>(array_result->elements[1])->value == 3);
     }
 
     SECTION("rest with single element array") {
-        std::vector<std::shared_ptr<Object>> elements = {std::make_shared<Integer>(1)};
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(elements)};
+        std::vector<Object *> elements = {new Integer(1)};
+        std::vector<Object *> args = {new Array(elements)};
         auto result = monkey_rest(args);
         REQUIRE(result->type() == ARRAY_OBJ);
-        
-        auto* array_result = dynamic_cast<Array*>(result);
+
+        auto *array_result = dynamic_cast<Array *>(result);
         REQUIRE(array_result->elements.empty());
     }
 
     SECTION("rest with empty array") {
-        std::vector<std::shared_ptr<Object>> elements = {};
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(elements)};
+        std::vector<Object *> elements = {};
+        std::vector<Object *> args = {new Array(elements)};
         auto result = monkey_rest(args);
         REQUIRE(result == nullptr);
     }
 
     SECTION("rest with wrong number of arguments") {
-        std::vector<std::shared_ptr<Object>> args = {};
+        std::vector<Object *> args = {};
         auto result = monkey_rest(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
 
     SECTION("rest with wrong type of argument") {
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Integer>(5)};
+        std::vector<Object *> args = {new Integer(5)};
         auto result = monkey_rest(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
@@ -200,48 +213,48 @@ TEST_CASE("Builtin rest function", "[builtins]") {
 
 TEST_CASE("Builtin push function", "[builtins]") {
     SECTION("push to non-empty array") {
-        std::vector<std::shared_ptr<Object>> elements = {
-            std::make_shared<Integer>(1),
-            std::make_shared<Integer>(2)
+        std::vector<Object *> elements = {
+            new Integer(1),
+            new Integer(2),
         };
-        std::vector<std::shared_ptr<Object>> args = {
-            std::make_shared<Array>(elements),
-            std::make_shared<Integer>(3)
+        std::vector<Object *> args = {
+            new Array(elements),
+            new Integer(3)
         };
         auto result = monkey_push(args);
         REQUIRE(result->type() == ARRAY_OBJ);
-        
-        auto* array_result = dynamic_cast<Array*>(result);
+
+        auto *array_result = dynamic_cast<Array *>(result);
         REQUIRE(array_result->elements.size() == 3);
-        REQUIRE(dynamic_cast<Integer*>(array_result->elements[0].get())->value == 1);
-        REQUIRE(dynamic_cast<Integer*>(array_result->elements[1].get())->value == 2);
-        REQUIRE(dynamic_cast<Integer*>(array_result->elements[2].get())->value == 3);
+        REQUIRE(dynamic_cast<Integer*>(array_result->elements[0])->value == 1);
+        REQUIRE(dynamic_cast<Integer*>(array_result->elements[1])->value == 2);
+        REQUIRE(dynamic_cast<Integer*>(array_result->elements[2])->value == 3);
     }
 
     SECTION("push to empty array") {
-        std::vector<std::shared_ptr<Object>> elements = {};
-        std::vector<std::shared_ptr<Object>> args = {
-            std::make_shared<Array>(elements),
-            std::make_shared<Integer>(1)
+        std::vector<Object *> elements = {};
+        std::vector<Object *> args = {
+            new Array(elements),
+            new Integer(1),
         };
         auto result = monkey_push(args);
         REQUIRE(result->type() == ARRAY_OBJ);
-        
-        auto* array_result = dynamic_cast<Array*>(result);
+
+        auto *array_result = dynamic_cast<Array *>(result);
         REQUIRE(array_result->elements.size() == 1);
-        REQUIRE(dynamic_cast<Integer*>(array_result->elements[0].get())->value == 1);
+        REQUIRE(dynamic_cast<Integer*>(array_result->elements[0])->value == 1);
     }
 
     SECTION("push with wrong number of arguments") {
-        std::vector<std::shared_ptr<Object>> args = {std::make_shared<Array>(std::vector<std::shared_ptr<Object>>())};
+        std::vector<Object *> args = {new Array(std::vector<Object *>())};
         auto result = monkey_push(args);
         REQUIRE(result->type() == ERROR_OBJ);
     }
 
     SECTION("push with wrong type of first argument") {
-        std::vector<std::shared_ptr<Object>> args = {
-            std::make_shared<Integer>(5),
-            std::make_shared<Integer>(1)
+        std::vector<Object *> args = {
+            new Integer(5),
+            new Integer(1),
         };
         auto result = monkey_push(args);
         REQUIRE(result->type() == ERROR_OBJ);

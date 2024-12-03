@@ -11,17 +11,17 @@
 
 #include "object.h"
 
-Object *monkey_len(const std::vector<std::shared_ptr<Object> > &args);
+Object *monkey_len(const std::vector<Object*>& args);
 
-Object *monkey_puts(const std::vector<std::shared_ptr<Object> > &args);
+Object *monkey_puts(const std::vector<Object* > &args);
 
-Object *monkey_first(const std::vector<std::shared_ptr<Object> > &args);
+Object *monkey_first(const std::vector<Object*>& args);
 
-Object *monkey_last(const std::vector<std::shared_ptr<Object> > &args);
+Object *monkey_last(const std::vector<Object*>& args);
 
-Object *monkey_rest(const std::vector<std::shared_ptr<Object> > &args);
+Object *monkey_rest(const std::vector<Object*>& args);
 
-Object *monkey_push(const std::vector<std::shared_ptr<Object> > &args);
+Object *monkey_push(const std::vector<Object*>& args);
 
 inline std::vector<std::pair<std::string, Builtin *> > builtins = {
     {"len", new Builtin(&monkey_len)},
