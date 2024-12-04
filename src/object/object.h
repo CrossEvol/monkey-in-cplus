@@ -118,9 +118,9 @@ namespace OBJ {
 
 class ReturnValue final : public Object {
 public:
-    std::shared_ptr<Object> value;
+    Object *value;
 
-    explicit ReturnValue(std::shared_ptr<Object> value) : value(std::move(value)) {
+    explicit ReturnValue(Object &value) : value(&value) {
     }
 
     ~ReturnValue() override = default;

@@ -47,6 +47,7 @@ add_library(monkey_library STATIC
         src/compiler/symbol_table.cpp
         src/vm/frame.cpp
         src/vm/vm.cpp
+        src/evaluator/evaluator.cpp
 )
 add_library(monkey::library ALIAS monkey_library)
 
@@ -58,6 +59,7 @@ target_include_directories(monkey_library
         ${PROJECT_SOURCE_DIR}/common
         ${PROJECT_SOURCE_DIR}/code
         ${PROJECT_SOURCE_DIR}/compiler
+        ${PROJECT_SOURCE_DIR}/evaluator
         ${PROJECT_SOURCE_DIR}/lexer
         ${PROJECT_SOURCE_DIR}/parser
         ${PROJECT_SOURCE_DIR}/object
@@ -93,6 +95,7 @@ add_executable(unit_tests
         test/symbol_table_tests.cpp
         test/vm_tests.cpp
         test/common_suite.h
+        test/evaluator_tests.cpp
 )
 
 # Link libraries to test executable
