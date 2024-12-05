@@ -83,6 +83,17 @@ add_executable(start_up
 target_link_libraries(start_up PRIVATE monkey::library)
 
 ############################################################
+# Create Benchmark executable
+############################################################
+
+add_executable(benchmark
+        src/benchmark/main.cpp
+)
+
+# Link libraries to main executable
+target_link_libraries(benchmark PRIVATE monkey::library)
+
+############################################################
 # Create Test executable
 ############################################################
 
