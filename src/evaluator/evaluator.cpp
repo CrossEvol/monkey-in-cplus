@@ -100,7 +100,7 @@ Object *Evaluator::Eval(Ast::Node &_node, Environment &env) {
             params.push_back(std::make_shared<Ast::Identifier>(std::move(param)));
         }
         return new Function(params, std::make_shared<Ast::BlockStatement>(std::move(*node->body)),
-                            std::make_shared<Environment>(env));
+                            std::shared_ptr<Environment>(&env));
     }
     if (instance_of<Ast::Node, Ast::CallExpression>(_node)) {
         const auto node = dynamic_cast<Ast::CallExpression *>(&_node);

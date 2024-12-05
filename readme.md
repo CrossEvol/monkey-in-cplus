@@ -61,3 +61,15 @@ Translated into a list of features, we can say that Monkey supports:
 - first-class functions
 - return statements
 - closures
+
+# Bugs
+## too slow
+```shell
+PS D:\C_CODE\monkey_in_c_plus\cmake-build-debug-mingw> .\benchmark.exe eval
+engine=eval, result=9227465, duration=394.4s
+
+PS D:\C_CODE\monkey_in_c_plus\cmake-build-debug-mingw> .\benchmark.exe 
+engine=vm, result=9227465, duration=280.679s
+
+```
+both eval and vm are too slow. 

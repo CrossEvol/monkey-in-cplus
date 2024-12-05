@@ -396,6 +396,24 @@ ourFunction(20) + first + second;
         REQUIRE(testIntegerObject(evaluated, 70));
     }
 
+    TEST_CASE("Test recursive fibonacci","[evaluator]") {
+        std::string input =  "let fibonacci = fn(x) { "
+                "    if (x == 0) { "
+                "        return 0; "
+                "    } else { "
+                "        if (x == 1) { "
+                "            return 1; "
+                "        } else { "
+                "            fibonacci(x - 1) + fibonacci(x - 2); "
+                "        } "
+                "    } "
+                "}; "
+                "fibonacci(15);";
+
+        Object* evaluated = testEval(input);
+        REQUIRE(testIntegerObject(evaluated, 610));
+    }
+
     TEST_CASE("Test closures", "[evaluator]") {
         std::string input = R"(
 let newAdder = fn(x) {
