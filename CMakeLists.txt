@@ -48,6 +48,7 @@ add_library(monkey_library STATIC
         src/vm/frame.cpp
         src/vm/vm.cpp
         src/evaluator/evaluator.cpp
+        src/repl/repl.cpp
 )
 add_library(monkey::library ALIAS monkey_library)
 
@@ -63,6 +64,7 @@ target_include_directories(monkey_library
         ${PROJECT_SOURCE_DIR}/lexer
         ${PROJECT_SOURCE_DIR}/parser
         ${PROJECT_SOURCE_DIR}/object
+        ${PROJECT_SOURCE_DIR}/repl
         ${PROJECT_SOURCE_DIR}/token
         ${PROJECT_SOURCE_DIR}/vm
 )
