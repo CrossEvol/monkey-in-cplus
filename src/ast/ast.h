@@ -11,6 +11,28 @@
 #include "../token/token.h"
 
 namespace Ast {
+    enum TypeID: uint8_t {
+        Statement_,
+        Expression_,
+        Program_,
+        Identifier_,
+        LetStatement_,
+        ReturnStatement_,
+        ExpressionStatement_,
+        BlockStatement_,
+        Boolean_,
+        IntegerLiteral_,
+        PrefixExpression_,
+        InfixExpression_,
+        IfExpression_,
+        FunctionLiteral_,
+        CallExpression_,
+        StringLiteral_,
+        ArrayLiteral_,
+        IndexExpression_,
+        HashLiteral_,
+    };
+
     class Node {
     public:
         virtual ~Node() = default;
@@ -18,6 +40,8 @@ namespace Ast {
         virtual std::string tokenLiteral() = 0;
 
         virtual std::string string() =0;
+
+        virtual TypeID typeID() = 0;
     };
 
     class Statement : virtual public Node {
@@ -30,6 +54,8 @@ namespace Ast {
         std::string tokenLiteral() override = 0;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class Expression : virtual public Node {
@@ -42,6 +68,8 @@ namespace Ast {
         std::string tokenLiteral() override =0;
 
         std::string string() override = 0;
+
+        TypeID typeID() override;
     };
 
     class Program final : public Node {
@@ -57,6 +85,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class Identifier final : public Expression {
@@ -74,6 +104,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class LetStatement final : public Statement {
@@ -93,6 +125,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class ReturnStatement final : public Statement {
@@ -110,6 +144,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class ExpressionStatement final : public Statement {
@@ -127,6 +163,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class BlockStatement final : public Statement {
@@ -151,6 +189,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class Boolean final : public Expression {
@@ -168,6 +208,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class IntegerLiteral final : public Expression {
@@ -185,6 +227,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class PrefixExpression final : public Expression {
@@ -202,6 +246,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class InfixExpression final : public Expression {
@@ -221,6 +267,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class IfExpression final : public Expression {
@@ -245,6 +293,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class FunctionLiteral final : public Expression {
@@ -264,6 +314,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class CallExpression final : public Expression {
@@ -285,6 +337,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class StringLiteral final : public Expression {
@@ -301,6 +355,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class ArrayLiteral final : public Expression {
@@ -317,6 +373,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class IndexExpression final : public Expression {
@@ -334,6 +392,8 @@ namespace Ast {
         std::string tokenLiteral() override;
 
         std::string string() override;
+
+        TypeID typeID() override;
     };
 
     class HashLiteral final : public Expression {
@@ -354,6 +414,8 @@ namespace Ast {
         std::string string() override;
 
         Expression *get(Expression &left);
+
+        TypeID typeID() override;
     };
 }
 

@@ -303,3 +303,80 @@ Expression* HashLiteral::get( Expression &left) {
     // TODO: should use move here ?
     return this->pairs.at(hash_key).second.get();
 }
+
+
+TypeID Statement::typeID() { 
+    return TypeID::Statement_; 
+}
+
+TypeID Expression::typeID() { 
+    return TypeID::Expression_; 
+}
+
+TypeID Program::typeID() { 
+    return TypeID::Program_; 
+}
+
+TypeID Identifier::typeID() { 
+    return TypeID::Identifier_; 
+}
+
+TypeID LetStatement::typeID() { 
+    return TypeID::LetStatement_; 
+}
+
+TypeID ReturnStatement::typeID() { 
+    return TypeID::ReturnStatement_; 
+}
+
+TypeID ExpressionStatement::typeID() { 
+    return TypeID::ExpressionStatement_; 
+}
+
+TypeID BlockStatement::typeID() { 
+    return TypeID::BlockStatement_; 
+}
+
+TypeID Boolean::typeID() { 
+    return TypeID::Boolean_; 
+}
+
+TypeID IntegerLiteral::typeID() { 
+    return TypeID::IntegerLiteral_; 
+}
+
+TypeID PrefixExpression::typeID() { 
+    return TypeID::PrefixExpression_; 
+}
+
+TypeID InfixExpression::typeID() { 
+    return TypeID::InfixExpression_; 
+}
+
+TypeID IfExpression::typeID() { 
+    return TypeID::IfExpression_; 
+}
+
+TypeID FunctionLiteral::typeID() { 
+    return TypeID::FunctionLiteral_; 
+}
+
+TypeID CallExpression::typeID() { 
+    return TypeID::CallExpression_; 
+}
+
+TypeID StringLiteral::typeID() { 
+    return TypeID::StringLiteral_; 
+}
+
+TypeID ArrayLiteral::typeID() { 
+    return TypeID::ArrayLiteral_; 
+}
+
+TypeID IndexExpression::typeID() { 
+    return TypeID::IndexExpression_; 
+}
+
+TypeID HashLiteral::typeID() { 
+    return TypeID::HashLiteral_; 
+}
